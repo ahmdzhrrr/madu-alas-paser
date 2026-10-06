@@ -10,6 +10,7 @@ import EditProduct from "../pages/admin/EditProduct";
 import CategoriesAdmin from "../pages/admin/CategoriesAdmin";
 import SettingsAdmin from "../pages/admin/SettingsAdmin";
 import CarouselAdmin from "../pages/admin/CarouselAdmin";
+import TestimonialsAdmin from "../pages/admin/TestimonialsAdmin";
 import ProtectedRoute from "../components/ProtectedRoute";
 
   
@@ -100,6 +101,15 @@ import ProtectedRoute from "../components/ProtectedRoute";
             element={
               <ProtectedRoute>
                 <CarouselAdmin />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/testimonials"
+            element={
+              <ProtectedRoute>
+                <TestimonialsAdmin />
               </ProtectedRoute>
             }
           />

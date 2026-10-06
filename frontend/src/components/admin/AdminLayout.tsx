@@ -66,6 +66,13 @@ export default function AdminLayout({
             Carousel
           </Link>
 
+          <Link
+            to="/admin/testimonials"
+            className="p-4 hover:bg-amber-800"
+          >
+            Testimonial
+          </Link>
+
           <button
             onClick={logout}
             className="mt-auto p-4 text-left hover:bg-red-700"

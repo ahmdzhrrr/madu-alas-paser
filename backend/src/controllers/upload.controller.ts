@@ -14,7 +14,8 @@ export const uploadImage = async (
     const allowedBuckets = [
       "Produk",
       "Carousel",
-      "Logo"
+      "Logo",
+      "Testimonial"
     ];
 
     if (
@@ -34,7 +35,10 @@ export const uploadImage = async (
     }
 
     const filename =
-      `${Date.now()}-${file.originalname}`;
+      `${Date.now()}-${file.originalname
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9.-]/g, "-")}`;
 
     const { error } =
       await supabase.storage

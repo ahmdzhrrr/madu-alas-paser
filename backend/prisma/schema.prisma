@@ -40,6 +40,8 @@ model Product {
   category    Category @relation(fields: [categoryId], references: [id])
 
   createdAt   DateTime @default(now())
+
+  orderItems  OrderItem[]
 }
 
 model SiteSetting {
@@ -75,4 +77,59 @@ model CarouselSlide {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Testimonial {
+  id        Int      @id @default(autoincrement())
+
+  name      String
+  content   String
+  rating    Int      @default(5)
+  imageUrl  String?
+
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum OrderStatus {
+  MENUNGGU
+  DIPROSES
+  DIKIRIM
+  SELESAI
+  DIBATALKAN
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  orderNumber     String      @unique
+
+  customerName    String
+  customerPhone   String
+  customerAddress String
+
+  total           Decimal
+  status          OrderStatus @default(MENUNGGU)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id          Int      @id @default(autoincrement())
+
+  orderId     Int
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId   Int
+  product     Product  @relation(fields: [productId], references: [id])
+
+  productName String
+  price       Decimal
+  quantity    Int
+
+  createdAt   DateTime @default(now())
 }

@@ -8,6 +8,7 @@ import uploadRoutes from "./routes/upload.routes";
 import settingRoutes from "./routes/setting.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import carouselRoutes from "./routes/carousel.routes";
+import testimonialRoutes from "./routes/testimonial.routes";
 
 const app = express();
 
@@ -20,5 +21,6 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/settings", settingRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/carousel", carouselRoutes);
+app.use("/api/testimonials", testimonialRoutes);
 
 export default app;

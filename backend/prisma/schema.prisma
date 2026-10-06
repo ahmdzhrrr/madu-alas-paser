@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+}
+
+model User {
+  id        Int   @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id        Int   @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+
+  products  Product[]
+}
+
+model Product {
+  id          Int   @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal
+  stock       Int      @default(0)
+  imageUrl    String?
+
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  createdAt   DateTime @default(now())
+}
+
+model SiteSetting {
+  id               Int      @id @default(autoincrement())
+
+  whatsapp         String
+  instagram        String?
+  facebook         String?
+  address          String?
+
+  siteName         String?
+  logoUrl          String?
+
+  aboutDescription String?
+
+  featureTitle     String?
+  feature1         String?
+  feature2         String?
+  feature3         String?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model CarouselSlide {
+  id        Int      @id @default(autoincrement())
+
+  title     String
+  subtitle  String?
+  imageUrl  String
+
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -11,6 +11,10 @@ import CategoriesAdmin from "../pages/admin/CategoriesAdmin";
 import SettingsAdmin from "../pages/admin/SettingsAdmin";
 import CarouselAdmin from "../pages/admin/CarouselAdmin";
 import TestimonialsAdmin from "../pages/admin/TestimonialsAdmin";
+import OrdersAdmin from "../pages/admin/OrdersAdmin";
+import Cart from "../pages/Cart";
+import Checkout from "../pages/Checkout";
+import OrderTracking from "../pages/OrderTracking";
 import ProtectedRoute from "../components/ProtectedRoute";
 
   
@@ -28,7 +32,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
           />
 
           <Route
-            path="/"
+            path="/Products"
             element={<Products />}
           />
 
@@ -112,6 +116,30 @@ import ProtectedRoute from "../components/ProtectedRoute";
                 <TestimonialsAdmin />
               </ProtectedRoute>
             }
+          />
+
+          <Route
+            path="/admin/orders"
+            element={
+              <ProtectedRoute>
+                <OrdersAdmin />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/cart"
+            element={<Cart />}
+          />
+
+          <Route
+            path="/checkout"
+            element={<Checkout />}
+          />
+
+          <Route
+            path="/pesanan/:orderNumber"
+            element={<OrderTracking />}
           />
 
         </Routes>

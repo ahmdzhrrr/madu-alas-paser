@@ -105,18 +105,31 @@ export const createOrder = async (
               customerName,
               customerPhone,
               customerAddress,
-              total,
+              total
+            }
+          });
 
-              items: {
-                create: orderItems
-              }
+        await tx.orderItem.createMany({
+          data: orderItems.map((item) => ({
+            orderId: newOrder.id,
+            productId: item.productId,
+            productName: item.productName,
+            price: item.price,
+            quantity: item.quantity
+          }))
+        });
+
+        const result =
+          await tx.order.findUnique({
+            where: {
+              id: newOrder.id
             },
             include: {
               items: true
             }
           });
 
-        return newOrder;
+        return result;
       }
     );
 
@@ -169,6 +182,140 @@ export const getOrderByNumber = async (
 
     res.status(500).json({
       message: "Gagal mengambil pesanan"
+    });
+
+  }
+};
+
+export const getOrders = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+
+    const orders =
+      await prisma.order.findMany({
+        include: {
+          items: true
+        },
+        orderBy: {
+          createdAt: "desc"
+        }
+      });
+
+    res.json(orders);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Gagal mengambil daftar pesanan"
+    });
+
+  }
+};
+
+export const updateOrderStatus = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+
+    const orderNumber =
+      String(req.params.orderNumber);
+
+    const { status } = req.body;
+
+    const allowedStatuses = [
+      "MENUNGGU",
+      "DIPROSES",
+      "DIKIRIM",
+      "SELESAI",
+      "DIBATALKAN"
+    ];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        message: "Status pesanan tidak valid"
+      });
+    }
+
+    const order =
+      await prisma.order.findUnique({
+        where: {
+          orderNumber
+        },
+        include: {
+          items: true
+        }
+      });
+
+    if (!order) {
+      return res.status(404).json({
+        message: "Pesanan tidak ditemukan"
+      });
+    }
+
+    // Jika status sudah DIBATALKAN,
+    // jangan kembalikan stok lagi
+    if (
+      order.status === "DIBATALKAN" &&
+      status === "DIBATALKAN"
+    ) {
+      return res.json(order);
+    }
+
+    const updatedOrder =
+      await prisma.$transaction(
+        async (tx) => {
+
+          // Jika order baru dibatalkan,
+          // kembalikan stok setiap produk
+          if (
+            status === "DIBATALKAN" &&
+            order.status !== "DIBATALKAN"
+          ) {
+
+            for (const item of order.items) {
+
+              await tx.product.update({
+                where: {
+                  id: item.productId
+                },
+                data: {
+                  stock: {
+                    increment: item.quantity
+                  }
+                }
+              });
+
+            }
+          }
+
+          // Update status order
+          const updated =
+            await tx.order.update({
+              where: {
+                orderNumber
+              },
+              data: {
+                status
+              }
+            });
+
+          return updated;
+        }
+      );
+
+    res.json(updatedOrder);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Gagal mengubah status pesanan"
     });
 
   }

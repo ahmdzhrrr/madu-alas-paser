@@ -53,6 +53,13 @@ export default function AdminLayout({
           </Link>
 
           <Link
+            to="/admin/orders"
+            className="p-4 hover:bg-amber-800"
+          >
+            Kelola order
+          </Link>
+
+          <Link
             to="/admin/settings"
             className="p-4 hover:bg-amber-800"
           >

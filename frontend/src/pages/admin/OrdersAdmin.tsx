@@ -98,14 +98,13 @@ export default function OrdersAdmin() {
         )
       );
 
-    } catch (error) {
-
+    } catch (error: any) {
       console.error(error);
-
+    
       alert(
-        "Gagal mengubah status pesanan"
+        error.response?.data?.message ||
+        "Gagal mengubah status"
       );
-
     }
 
   }

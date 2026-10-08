@@ -15,7 +15,8 @@ export const uploadImage = async (
       "Produk",
       "Carousel",
       "Logo",
-      "Testimonial"
+      "Testimonial",
+      "About"
     ];
 
     if (

@@ -10,38 +10,69 @@ export default function ProductCard({
 }: Props) {
   return (
     <Link
-  to={`/products/${product.id}`}
-  className="block"
->
-  <div className="bg-white rounded-xl shadow">
+      to={`/products/${product.id}`}
+      className="group block"
+    >
+      <div className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
 
-    <img
-      src={
-        product.imageUrl ||
-        "https://placehold.co/600x400"
-      }
-      alt={product.name}
-      className="h-52 w-full object-cover rounded-t-xl"
-    />
+        {/* Image */}
+        <div className="relative h-64 overflow-hidden bg-amber-50">
 
-    <div className="p-4">
+          <img
+            src={
+              product.imageUrl ||
+              "https://placehold.co/600x400"
+            }
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
 
-      <h3 className="font-bold text-lg">
-        {product.name}
-      </h3>
+          {/* Category Badge */}
+          {product.category?.name && (
+            <div className="absolute top-4 left-4">
+              <span className="inline-flex items-center bg-white/90 backdrop-blur-sm text-amber-800 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">
+                {product.category.name}
+              </span>
+            </div>
+          )}
 
-      <p className="text-gray-500">
-        {product.category.name}
-      </p>
+        </div>
 
-      <p className="text-xl font-bold text-amber-700 mt-3">
-        Rp {Number(product.price)
-          .toLocaleString("id-ID")}
-      </p>
+        {/* Content */}
+        <div className="p-6">
 
-    </div>
+          <h3 className="text-xl font-bold text-gray-900 group-hover:text-amber-700 transition-colors">
+            {product.name}
+          </h3>
 
-  </div>
-</Link>
+          <p className="text-gray-500 text-sm mt-2">
+            {product.category.name}
+          </p>
+
+          <div className="flex items-end justify-between gap-4 mt-5">
+
+            <div>
+              <p className="text-xs text-gray-400 mb-1">
+                Harga
+              </p>
+
+              <p className="text-xl font-bold text-amber-700">
+                Rp{" "}
+                {Number(product.price).toLocaleString(
+                  "id-ID"
+                )}
+              </p>
+            </div>
+
+            <span className="text-sm font-semibold text-amber-600 group-hover:text-amber-700 group-hover:translate-x-1 transition-all">
+              Lihat →
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+    </Link>
   );
 }

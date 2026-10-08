@@ -15,6 +15,7 @@ import OrdersAdmin from "../pages/admin/OrdersAdmin";
 import Cart from "../pages/Cart";
 import Checkout from "../pages/Checkout";
 import OrderTracking from "../pages/OrderTracking";
+import OrderSearch from "../pages/OrderSearch";
 import ProtectedRoute from "../components/ProtectedRoute";
 
   
@@ -140,6 +141,11 @@ import ProtectedRoute from "../components/ProtectedRoute";
           <Route
             path="/pesanan/:orderNumber"
             element={<OrderTracking />}
+          />
+
+          <Route
+            path="/pesanan"
+            element={<OrderSearch/>}
           />
 
         </Routes>

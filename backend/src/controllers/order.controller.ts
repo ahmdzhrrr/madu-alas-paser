@@ -242,28 +242,67 @@ export const updateOrderStatus = async (
     }
 
     const order =
-      await prisma.order.findUnique({
-        where: {
-          orderNumber
-        },
-        include: {
-          items: true
-        }
-      });
-
+    await prisma.order.findUnique({
+      where: {
+        orderNumber
+      },
+      include: {
+        items: true
+      }
+    });
+  
     if (!order) {
       return res.status(404).json({
         message: "Pesanan tidak ditemukan"
       });
     }
+    
 
-    // Jika status sudah DIBATALKAN,
-    // jangan kembalikan stok lagi
+// Status SELESAI dan DIBATALKAN adalah status final
     if (
-      order.status === "DIBATALKAN" &&
-      status === "DIBATALKAN"
+      order.status === "SELESAI" ||
+      order.status === "DIBATALKAN"
     ) {
-      return res.json(order);
+      return res.status(400).json({
+        message:
+          `Pesanan dengan status ${order.status} tidak dapat diubah lagi`
+      });
+    }
+
+    // Aturan perubahan status
+    const allowedTransitions: Record<string, string[]> = {
+      MENUNGGU: [
+        "MENUNGGU",
+        "DIPROSES",
+        "DIKIRIM",
+        "SELESAI",
+        "DIBATALKAN"
+      ],
+
+      DIPROSES: [
+        "DIPROSES",
+        "DIKIRIM",
+        "SELESAI",
+        "DIBATALKAN"
+      ],
+
+      DIKIRIM: [
+        "DIKIRIM",
+        "SELESAI"
+      ],
+
+      SELESAI: [],
+
+      DIBATALKAN: []
+    };
+
+    if (
+      !allowedTransitions[order.status]?.includes(status)
+    ) {
+      return res.status(400).json({
+        message:
+          `Status ${order.status} tidak dapat diubah menjadi ${status}`
+      });
     }
 
     const updatedOrder =

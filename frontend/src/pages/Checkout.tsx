@@ -1,7 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import Navbar from "../components/Navbar";
 import { api } from "../services/api";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import {
+  faArrowRight,
+  faCartShopping,
+  faLocationDot,
+  faPhone,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface CartItem {
   productId: number;
@@ -12,11 +23,9 @@ interface CartItem {
 }
 
 export default function Checkout() {
-
   const navigate = useNavigate();
 
-  const [cart, setCart] =
-    useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   const [customerName, setCustomerName] =
     useState("");
@@ -31,28 +40,27 @@ export default function Checkout() {
     useState(false);
 
   useEffect(() => {
-
-    const savedCart =
-      JSON.parse(
-        localStorage.getItem("cart") || "[]"
-      );
+    const savedCart = JSON.parse(
+      localStorage.getItem("cart") || "[]"
+    );
 
     setCart(savedCart);
-
   }, []);
 
-  const total =
-    cart.reduce(
-      (sum, item) =>
-        sum +
-        item.price * item.quantity,
-      0
-    );
+  const total = cart.reduce(
+    (sum, item) =>
+      sum + item.price * item.quantity,
+    0
+  );
+
+  const totalItems = cart.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
 
   async function handleSubmit(
     e: React.FormEvent
   ) {
-
     e.preventDefault();
 
     if (cart.length === 0) {
@@ -61,237 +69,377 @@ export default function Checkout() {
     }
 
     try {
-
       setLoading(true);
 
-      const response =
-        await api.post("/orders", {
-
+      const response = await api.post(
+        "/orders",
+        {
           customerName,
           customerPhone,
           customerAddress,
 
           items: cart.map((item) => ({
             productId: item.productId,
-            quantity: item.quantity
-          }))
+            quantity: item.quantity,
+          })),
+        }
+      );
 
-        });
-
-      const order =
-        response.data;
+      const order = response.data;
 
       localStorage.removeItem("cart");
 
       navigate(
         `/pesanan/${order.orderNumber}`
       );
-
     } catch (error: any) {
-
       console.error(error);
 
       alert(
         error?.response?.data?.message ||
-        "Gagal membuat pesanan."
+          "Gagal membuat pesanan."
       );
-
     } finally {
-
       setLoading(false);
-
     }
-
   }
 
   if (cart.length === 0) {
-
     return (
-      <div>
+      <div className="min-h-screen bg-amber-50/40">
 
         <Navbar />
 
-        <div className="max-w-4xl mx-auto px-6 py-16 text-center">
+        <main className="py-16 md:py-20">
 
-          <h1 className="text-2xl font-bold mb-4">
-            Keranjang Kosong
-          </h1>
+          <div className="max-w-4xl mx-auto px-6 text-center">
 
-          <p className="text-gray-500 mb-6">
-            Silakan pilih produk terlebih dahulu.
-          </p>
+            <div className="bg-white border border-gray-100 rounded-3xl shadow-sm py-20 px-6">
 
-          <button
-            onClick={() => navigate("/products")}
-            className="bg-amber-700 text-white px-6 py-3 rounded-lg"
-          >
-            Lihat Produk
-          </button>
+              <div className="w-16 h-16 mx-auto rounded-full bg-amber-50 flex items-center justify-center text-amber-600 text-2xl">
+                <FontAwesomeIcon
+                  icon={faCartShopping}
+                />
+              </div>
 
-        </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mt-6">
+                Keranjang Kosong
+              </h1>
+
+              <p className="text-gray-500 mt-3">
+                Silakan pilih produk terlebih dahulu
+                sebelum melanjutkan ke checkout.
+              </p>
+
+              <button
+                type="button"
+                onClick={() =>
+                  navigate("/products")
+                }
+                className="inline-flex items-center gap-2 mt-7 bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-full font-semibold shadow-sm hover:shadow-md transition"
+              >
+                Lihat Produk
+                <FontAwesomeIcon
+                  icon={faArrowRight}
+                />
+              </button>
+
+            </div>
+
+          </div>
+
+        </main>
 
       </div>
     );
-
   }
 
   return (
-
-    <div>
+    <div className="min-h-screen bg-amber-50/40">
 
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-6 py-10">
+      <main className="py-12 md:py-16">
 
-        <h1 className="text-3xl font-bold mb-8">
-          Checkout
-        </h1>
+        <div className="max-w-7xl mx-auto px-6 md:px-10">
 
-        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Header */}
+          <div className="mb-10">
 
-          {/* Form Customer */}
+            <p className="text-amber-600 uppercase tracking-[0.2em] text-sm font-semibold mb-4">
+              Pesanan
+            </p>
 
-          <form
-            onSubmit={handleSubmit}
-            className="lg:col-span-2 bg-white border rounded-xl p-6"
-          >
+            <h1 className="text-3xl md:text-5xl font-bold text-gray-900">
+              Checkout
+            </h1>
 
-            <h2 className="text-xl font-bold mb-6">
-              Data Pemesan
-            </h2>
+            <p className="mt-4 text-gray-500 text-base md:text-lg">
+              Lengkapi data pemesan untuk menyelesaikan
+              pesananmu.
+            </p>
 
-            <div className="mb-5">
+          </div>
 
-              <label className="block font-medium mb-2">
-                Nama Lengkap
-              </label>
+          <div className="grid lg:grid-cols-3 gap-8">
 
-              <input
-                type="text"
-                value={customerName}
-                onChange={(e) =>
-                  setCustomerName(e.target.value)
-                }
-                required
-                className="w-full border rounded-lg px-4 py-3"
-                placeholder="Masukkan nama lengkap"
-              />
-
-            </div>
-
-            <div className="mb-5">
-
-              <label className="block font-medium mb-2">
-                Nomor WhatsApp
-              </label>
-
-              <input
-                type="tel"
-                value={customerPhone}
-                onChange={(e) =>
-                  setCustomerPhone(e.target.value)
-                }
-                required
-                className="w-full border rounded-lg px-4 py-3"
-                placeholder="Contoh: 081234567890"
-              />
-
-            </div>
-
-            <div className="mb-5">
-
-              <label className="block font-medium mb-2">
-                Alamat Lengkap
-              </label>
-
-              <textarea
-                value={customerAddress}
-                onChange={(e) =>
-                  setCustomerAddress(e.target.value)
-                }
-                required
-                rows={5}
-                className="w-full border rounded-lg px-4 py-3"
-                placeholder="Masukkan alamat lengkap pengiriman"
-              />
-
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-amber-700 text-white py-3 rounded-lg hover:bg-amber-800 disabled:opacity-50"
+            {/* Customer Form */}
+            <form
+              onSubmit={handleSubmit}
+              className="lg:col-span-2 bg-white border border-gray-100 rounded-3xl p-6 md:p-8 shadow-sm"
             >
-              {loading
-                ? "Memproses Pesanan..."
-                : "Buat Pesanan"}
-            </button>
 
-          </form>
+              <div className="flex items-center gap-3 mb-8">
 
+                <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <FontAwesomeIcon
+                    icon={faUser}
+                  />
+                </div>
 
-          {/* Ringkasan Pesanan */}
+                <div>
 
-          <div>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    Data Pemesan
+                  </h2>
 
-            <div className="bg-gray-50 rounded-xl p-6">
+                  <p className="text-sm text-gray-500 mt-1">
+                    Masukkan informasi untuk pengiriman
+                    pesanan.
+                  </p>
 
-              <h2 className="text-xl font-bold mb-5">
-                Pesanan Kamu
-              </h2>
+                </div>
 
-              <div className="space-y-4">
+              </div>
 
-                {cart.map((item) => (
+              {/* Name */}
+              <div className="mb-6">
 
-                  <div
-                    key={item.productId}
-                    className="flex justify-between gap-4"
-                  >
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Nama Lengkap
+                </label>
 
-                    <div>
+                <div className="relative">
 
-                      <p className="font-medium">
-                        {item.name}
-                      </p>
+                  <FontAwesomeIcon
+                    icon={faUser}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
 
-                      <p className="text-sm text-gray-500">
-                        {item.quantity} × Rp{" "}
-                        {item.price.toLocaleString(
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) =>
+                      setCustomerName(
+                        e.target.value
+                      )
+                    }
+                    required
+                    className="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 text-gray-900 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition"
+                    placeholder="Masukkan nama lengkap"
+                  />
+
+                </div>
+
+              </div>
+
+              {/* Phone */}
+              <div className="mb-6">
+
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Nomor WhatsApp
+                </label>
+
+                <div className="relative">
+
+                  <FontAwesomeIcon
+                    icon={faPhone}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+
+                  <input
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) =>
+                      setCustomerPhone(
+                        e.target.value
+                      )
+                    }
+                    required
+                    className="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 text-gray-900 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition"
+                    placeholder="Contoh: 081234567890"
+                  />
+
+                </div>
+
+                <p className="text-xs text-gray-400 mt-2">
+                  Nomor ini akan digunakan untuk
+                  menghubungi kamu terkait pesanan.
+                </p>
+
+              </div>
+
+              {/* Address */}
+              <div className="mb-8">
+
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Alamat Lengkap
+                </label>
+
+                <div className="relative">
+
+                  <FontAwesomeIcon
+                    icon={faLocationDot}
+                    className="absolute left-4 top-4 text-gray-400"
+                  />
+
+                  <textarea
+                    value={customerAddress}
+                    onChange={(e) =>
+                      setCustomerAddress(
+                        e.target.value
+                      )
+                    }
+                    required
+                    rows={5}
+                    className="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 text-gray-900 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition resize-none"
+                    placeholder="Masukkan alamat lengkap pengiriman"
+                  />
+
+                </div>
+
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white py-3.5 rounded-xl font-semibold shadow-sm hover:shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading
+                  ? "Memproses Pesanan..."
+                  : "Buat Pesanan"}
+
+                {!loading && (
+                  <FontAwesomeIcon
+                    icon={faArrowRight}
+                  />
+                )}
+              </button>
+
+            </form>
+
+            {/* Order Summary */}
+            <div>
+
+              <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-7 shadow-sm lg:sticky lg:top-28">
+
+                <div className="flex items-center justify-between">
+
+                  <div>
+
+                    <h2 className="text-xl font-bold text-gray-900">
+                      Pesanan Kamu
+                    </h2>
+
+                    <p className="text-sm text-gray-500 mt-1">
+                      {totalItems} item
+                    </p>
+
+                  </div>
+
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <FontAwesomeIcon
+                      icon={faCartShopping}
+                    />
+                  </div>
+
+                </div>
+
+                <div className="mt-7 space-y-5">
+
+                  {cart.map((item) => (
+
+                    <div
+                      key={item.productId}
+                      className="flex gap-3"
+                    >
+
+                      {/* Product Image */}
+                      <div className="w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-amber-50">
+
+                        <img
+                          src={
+                            item.imageUrl ||
+                            "https://placehold.co/150x150"
+                          }
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+
+                      </div>
+
+                      {/* Product Info */}
+                      <div className="flex-1 min-w-0">
+
+                        <p className="font-semibold text-gray-900 truncate">
+                          {item.name}
+                        </p>
+
+                        <p className="text-sm text-gray-500 mt-1">
+                          {item.quantity} × Rp{" "}
+                          {item.price.toLocaleString(
+                            "id-ID"
+                          )}
+                        </p>
+
+                      </div>
+
+                      <p className="font-semibold text-gray-900 text-sm whitespace-nowrap">
+                        Rp{" "}
+                        {(
+                          item.price *
+                          item.quantity
+                        ).toLocaleString(
                           "id-ID"
                         )}
                       </p>
 
                     </div>
 
-                    <p className="font-semibold">
+                  ))}
+
+                </div>
+
+                {/* Total */}
+                <div className="border-t border-gray-100 mt-7 pt-6">
+
+                  <div className="flex justify-between items-end">
+
+                    <span className="font-semibold text-gray-900">
+                      Total Pesanan
+                    </span>
+
+                    <span className="text-2xl font-bold text-amber-700">
                       Rp{" "}
-                      {(
-                        item.price *
-                        item.quantity
-                      ).toLocaleString(
+                      {total.toLocaleString(
                         "id-ID"
                       )}
-                    </p>
+                    </span>
 
                   </div>
 
-                ))}
+                </div>
 
-              </div>
+                <div className="mt-5 p-4 rounded-xl bg-amber-50">
 
-              <div className="border-t mt-5 pt-5 flex justify-between text-lg font-bold">
+                  <p className="text-sm text-amber-800 leading-relaxed">
+                    Setelah pesanan dibuat, kamu akan
+                    mendapatkan nomor pesanan untuk
+                    melacak status pesanan.
+                  </p>
 
-                <span>
-                  Total
-                </span>
-
-                <span className="text-amber-700">
-                  Rp{" "}
-                  {total.toLocaleString(
-                    "id-ID"
-                  )}
-                </span>
+                </div>
 
               </div>
 
@@ -301,9 +449,8 @@ export default function Checkout() {
 
         </div>
 
-      </div>
+      </main>
 
     </div>
-
   );
 }

@@ -10,20 +10,15 @@ interface Testimonial {
 }
 
 export default function Testimonials() {
-
   const [testimonials, setTestimonials] =
     useState<Testimonial[]>([]);
 
   useEffect(() => {
-
     loadTestimonials();
-
   }, []);
 
   async function loadTestimonials() {
-
     try {
-
       const response =
         await api.get("/testimonials");
 
@@ -34,13 +29,9 @@ export default function Testimonials() {
         );
 
       setTestimonials(activeTestimonials);
-
     } catch (error) {
-
       console.error(error);
-
     }
-
   }
 
   if (testimonials.length === 0) {
@@ -48,46 +39,77 @@ export default function Testimonials() {
   }
 
   return (
-    <section className="py-16 px-6 bg-gray-50">
+    <section className="py-20 md:py-28 bg-white">
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto px-6 md:px-10">
 
-        <div className="text-center mb-10">
+        {/* Heading */}
+        <div className="text-center max-w-2xl mx-auto">
 
-          <h2 className="text-3xl md:text-4xl font-bold">
-            Apa Kata Pelanggan?
+          <p className="text-amber-600 uppercase tracking-[0.2em] text-sm font-semibold mb-4">
+            Testimoni Pelanggan
+          </p>
+
+          <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
+            Apa Kata Mereka?
           </h2>
 
-          <p className="text-gray-600 mt-3">
+          <p className="mt-5 text-gray-500 text-base md:text-lg leading-relaxed">
             Pengalaman pelanggan menikmati Madu Alas Paser.
           </p>
 
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Testimonials */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mt-14">
 
-          {testimonials.map((testimonial) => (
+          {testimonials.map(
+            (testimonial, index) => (
+              <div
+                key={testimonial.id}
+                className="group relative bg-amber-50/60 border border-amber-100 rounded-3xl p-8 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+              >
 
-            <div
-              key={testimonial.id}
-              className="bg-white rounded-xl shadow-sm p-6"
-            >
+                {/* Number */}
+                <span className="absolute top-6 right-7 text-sm font-bold text-amber-200">
+                  0{index + 1}
+                </span>
 
-              <div className="text-yellow-500 text-lg mb-4">
-                {"★".repeat(testimonial.rating)}
+                {/* Quote */}
+                <div className="text-5xl leading-none text-amber-300 font-serif">
+                  “
+                </div>
+
+                {/* Rating */}
+                <div className="flex gap-1 mt-3 mb-5 text-amber-500">
+                  {Array.from({
+                    length: testimonial.rating
+                  }).map((_, starIndex) => (
+                    <span key={starIndex}>
+                      ★
+                    </span>
+                  ))}
+                </div>
+
+                {/* Content */}
+                <p className="text-gray-700 leading-relaxed min-h-[100px]">
+                  {testimonial.content}
+                </p>
+
+                {/* Customer */}
+                <div className="mt-7 pt-5 border-t border-amber-100">
+                  <p className="font-bold text-gray-900">
+                    {testimonial.name}
+                  </p>
+
+                  <p className="text-sm text-gray-500 mt-1">
+                    Pelanggan Madu Alas Paser
+                  </p>
+                </div>
+
               </div>
-
-              <p className="text-gray-600 leading-relaxed mb-5">
-                "{testimonial.content}"
-              </p>
-
-              <p className="font-semibold text-gray-900">
-                — {testimonial.name}
-              </p>
-
-            </div>
-
-          ))}
+            )
+          )}
 
         </div>
 

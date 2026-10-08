@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
 import { api } from "../services/api";
 
 interface Slide {
@@ -18,15 +20,14 @@ export default function Carousel() {
     useState(0);
 
   useEffect(() => {
-
     loadSlides();
-
   }, []);
 
   useEffect(() => {
 
-    if (slides.length === 0)
+    if (slides.length <= 1) {
       return;
+    }
 
     const interval =
       setInterval(() => {
@@ -68,9 +69,7 @@ export default function Carousel() {
   }
 
   if (slides.length === 0) {
-
     return null;
-
   }
 
   const slide =
@@ -78,62 +77,124 @@ export default function Carousel() {
 
   return (
 
-    <section className="relative h-[500px] overflow-hidden">
+    <section className="relative h-[520px] md:h-[650px] overflow-hidden bg-gray-900">
+
+      {/* Background Image */}
 
       <img
         src={slide.imageUrl}
         alt={slide.title}
-        className="w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover"
       />
 
-      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
 
-        <div className="text-center text-white px-6">
+      {/* Gradient Overlay */}
 
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+      <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/10" />
 
+
+      {/* Content */}
+
+      <div className="relative h-full max-w-7xl mx-auto px-6 md:px-10 flex items-center">
+
+        <div className="max-w-2xl text-white">
+
+          <p className="text-amber-300 uppercase tracking-[0.2em] text-xs md:text-sm font-semibold mb-4">
+            Madu Alas Paser
+          </p>
+
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
             {slide.title}
-
           </h1>
 
           {slide.subtitle && (
 
-            <p className="text-lg md:text-2xl">
-
+            <p className="mt-5 text-base md:text-xl text-gray-200 leading-relaxed max-w-xl">
               {slide.subtitle}
-
             </p>
 
           )}
+
+
+          {/* Buttons */}
+
+          <div className="flex flex-wrap gap-3 mt-8">
+
+            <Link
+              to="/products"
+              className="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-full font-semibold transition shadow-lg"
+            >
+              Lihat Produk
+              <span className="ml-2">
+                →
+              </span>
+            </Link>
+
+            <Link
+              to="/pesanan"
+              className="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-6 py-3 rounded-full font-semibold transition"
+            >
+              Lacak Pesanan
+            </Link>
+
+          </div>
 
         </div>
 
       </div>
 
-      {/* Indicator */}
 
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+      {/* Slide Indicator */}
 
-        {slides.map((_, index) => (
+      {slides.length > 1 && (
 
-          <button
-            key={index}
-            onClick={() =>
-              setCurrentIndex(index)
-            }
-            className={`w-3 h-3 rounded-full ${
-              currentIndex === index
-                ? "bg-white"
-                : "bg-white/50"
-            }`}
-          />
+        <div className="absolute bottom-8 left-6 md:left-10 flex items-center gap-2">
 
-        ))}
+          {slides.map((_, index) => (
 
-      </div>
+            <button
+              key={index}
+              onClick={() =>
+                setCurrentIndex(index)
+              }
+              aria-label={`Slide ${index + 1}`}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                currentIndex === index
+                  ? "w-10 bg-amber-400"
+                  : "w-5 bg-white/50 hover:bg-white/80"
+              }`}
+            />
+
+          ))}
+
+        </div>
+
+      )}
+
+
+      {/* Slide Number */}
+
+      {slides.length > 1 && (
+
+        <div className="absolute bottom-8 right-6 md:right-10 text-white/80 text-sm">
+
+          <span className="font-semibold">
+            {String(currentIndex + 1).padStart(2, "0")}
+          </span>
+
+          <span className="mx-2">
+            /
+          </span>
+
+          <span>
+            {String(slides.length).padStart(2, "0")}
+          </span>
+
+        </div>
+
+      )}
 
     </section>
 
   );
-
 }

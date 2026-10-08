@@ -72,6 +72,54 @@ import {
     
     }
 
+    async function uploadAboutImage(
+      file: File
+    ) {
+    
+      try {
+    
+        setUploading(true);
+    
+        const formData =
+          new FormData();
+    
+        formData.append(
+          "image",
+          file
+        );
+    
+        const response =
+          await api.post(
+            "/upload/About",
+            formData,
+            {
+              headers: {
+                "Content-Type":
+                  "multipart/form-data"
+              }
+            }
+          );
+    
+        setForm({
+          ...form,
+          aboutImageUrl:
+            response.data.imageUrl
+        });
+    
+      } catch (error) {
+    
+        console.error(error);
+    
+        alert("Upload foto About gagal");
+    
+      } finally {
+    
+        setUploading(false);
+    
+      }
+    
+    }
+
     async function save() {
   
       await api.put(
@@ -135,6 +183,37 @@ import {
             </p>
 
           )}
+
+          <div className="mb-6">
+
+          <label className="block mb-2">
+            Foto About
+          </label>
+
+          {form.aboutImageUrl && (
+            <img
+              src={form.aboutImageUrl}
+              alt="Foto About"
+              className="w-full max-w-md h-48 object-cover rounded-xl mb-3"
+            />
+          )}
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+
+              const file =
+                e.target.files?.[0];
+
+              if (file) {
+                uploadAboutImage(file);
+              }
+
+            }}
+          />
+
+          </div>
 
           <input
             className="border p-3 w-full mb-4"
